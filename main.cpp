@@ -38,21 +38,10 @@ namespace HyOct
         }
 
 
-        void run(void)
+        std::vector<double> run(void) const
         {
-#if 0
-    x(0) = x0;
-    x(1) = H;
-    x(2) = q;
-    x(3) = Aeq;
-    x(4) = beq;
-    x(5) = Ain;
-    x(6) = Bin;
-    x(7) = maxit;
-#endif
             const int n_dim = 3;
             const int n_data = data_list.size();
-
 
             ColumnVector x0(n_dim);
             Matrix H(n_dim, n_dim);
@@ -87,16 +76,14 @@ namespace HyOct
 
             Bin.fill(-1);
 
-#define ss(x) #x
-#define SH(x) std::cout << ss(x) << " = \n" << x
-
-            SH(x0);
-            SH(H);
-            SH(Ain);
-
-
             ColumnVector r = HyOct::OctQP(x0, H, q, Aeq, Beq, Ain, Bin).minimize();
-            std::cout << r;
+
+            std::vector<double> ret;
+            ret.push_back(r(0));
+            ret.push_back(r(1));
+            ret.push_back(r(2));
+
+            return ret;
         }
 
 
@@ -211,13 +198,17 @@ void Test1(void)
 
 int main (void)
 {
-    TestQP();
+//    TestQP();
 
-    double x[3] = {1, 3, 5};
+    double x[3] = {1.5, 3, 5};
     double y[3] = {1, 1, 2};
     HyOct::MaxRegressionLine mrl(x, y, 3);
     mrl.TestShow();
-    mrl.run();
+    std::vector<double> r = mrl.run();
+    for (int i = 0; i < 3; ++i)
+        printf("r(%d) = %.2lf\n", i, r[i]);
+
+
 //    Test1();
 
     return 0;
