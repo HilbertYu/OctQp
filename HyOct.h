@@ -56,21 +56,6 @@ namespace HyOct
             octave_value_list ret = F__qp__(x, 1);
             return ret(0).vector_value();
         }
-
-
-
-#if 0
-    x(0) = x0;
-    x(1) = H;
-    x(2) = q;
-    x(3) = Aeq;
-    x(4) = beq;
-    x(5) = Ain;
-    x(6) = Bin;
-    x(7) = maxit;
-#endif
-
-
     };
 }
 

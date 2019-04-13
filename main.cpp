@@ -1,78 +1,45 @@
 #include <iostream>
 #include <vector>
-#include <octave/oct.h>
-#include <octave/octave.h>
-#include <octave/parse.h>
-#include <octave/builtin-defun-decls.h>
-#include <octave/CMatrix.h>
-#include <octave/Array.h>
+#include <assert.h>
+#include <algorithm>
+#include "HyOct.h"
 
-
-//==============
-
-#if 0
-    ColumnVector x0(3);
-    Matrix H(3, 3);
-    const ColumnVector q(3);
-
-    Matrix Aeq(3, 3);
-    ColumnVector beq(3);
-
-    Matrix Ain(6, 3);
-    ColumnVector Bin(6);
-    const int maxit = 200;
-#endif
 
 namespace HyOct
 {
-    template <int n_dim, int n_eqdim, int n_indim>
-    class OctQP
+    class MaxRegressionLine
     {
-        ColumnVector m_x0;
-        Matrix m_H;
-        ColumnVector m_q;
-        Matrix m_Aeq;
-        ColumnVector m_Beq;
-        Matrix m_Ain;
-        ColumnVector m_Bin;
+        typedef std::vector<double> rn_data;
+        std::vector<rn_data> data_list;
+
     public:
-        OctQP(const ColumnVector & x0,
-           const Matrix & H,
-           const ColumnVector & q,
-           const Matrix & Aeq,
-           const ColumnVector & Beq,
-           const Matrix & Ain,
-           const ColumnVector & Bin):
-            m_x0(x0),
-            m_H(H),
-            m_q(q),
-            m_Aeq(Aeq),
-            m_Beq(Beq),
-            m_Ain(Ain),
-            m_Bin(Bin)
+        template<typename pos_t>
+        MaxRegressionLine(const pos_t & vx, const pos_t & vy, int n_data)
         {
+            data_list.clear();
+            for (int i = 0; i < n_data; ++i)
+            {
+                rn_data v;
+                v.push_back(vx[i]);
+                v.push_back(vy[i]);
+                data_list.push_back(v);
+            }
+        }
+
+        void TestShow(void)
+        {
+            auto f = [](rn_data d)
+            {
+                printf("(%.2lf, %.2lf)\n", d[0], d[1]);
+            };
+
+            for_each(data_list.begin(), data_list.end(), f);
 
         }
 
-        ColumnVector minimize(void)
+
+        void run(void)
         {
-            octave_value_list x;
-
-            x(0) = m_x0;
-            x(1) = m_H;
-            x(2) = m_q;
-            x(3) = m_Aeq;
-            x(4) = m_Beq;
-            x(5) = m_Ain;
-            x(6) = m_Bin;
-            x(7) = 200;
-
-            octave_value_list ret = F__qp__(x, 1);
-            return ret(0).vector_value();
-        }
-
-
-
 #if 0
     x(0) = x0;
     x(1) = H;
@@ -83,6 +50,54 @@ namespace HyOct
     x(6) = Bin;
     x(7) = maxit;
 #endif
+            const int n_dim = 3;
+            const int n_data = data_list.size();
+
+
+            ColumnVector x0(n_dim);
+            Matrix H(n_dim, n_dim);
+            ColumnVector q(n_dim);
+            Matrix Aeq(n_dim, n_dim);
+            ColumnVector Beq(n_dim);
+            Matrix Ain(n_data*2, n_dim);
+            ColumnVector Bin(n_data*2);
+
+            x0.fill(0);
+
+            H.fill(0);
+            for (int i = 0; i < n_dim - 1; ++i)
+                H(i, i) = -1;
+
+            q.fill(0);
+            Aeq.fill(0);
+            Beq.fill(0);
+
+            Matrix T(n_data, 2);
+            for (int i = 0; i < n_data; ++i)
+            {
+                for (int axis = 0; axis < n_dim - 1; ++axis)
+                {
+                    T(i, axis) = data_list.at(i).at(axis);
+                }
+            }
+
+            T = T.append(ColumnVector(n_data).fill(1));
+            T = T.stack(-T);
+            Ain = T;
+
+            Bin.fill(-1);
+
+#define ss(x) #x
+#define SH(x) std::cout << ss(x) << " = \n" << x
+
+            SH(x0);
+            SH(H);
+            SH(Ain);
+
+
+            ColumnVector r = HyOct::OctQP(x0, H, q, Aeq, Beq, Ain, Bin).minimize();
+            std::cout << r;
+        }
 
 
     };
@@ -136,7 +151,7 @@ void TestQP(void)
     ColumnVector v = ret(0).vector_value();
     std::cout << ret(0).vector_value();
 
-    ColumnVector r = HyOct::OctQP<1,1,1>(x0, H, q, Aeq, beq, Ain, Bin).minimize();
+    ColumnVector r = HyOct::OctQP(x0, H, q, Aeq, beq, Ain, Bin).minimize();
     std::cout << r;
 
 }
@@ -198,6 +213,11 @@ int main (void)
 {
     TestQP();
 
+    double x[3] = {1, 3, 5};
+    double y[3] = {1, 1, 2};
+    HyOct::MaxRegressionLine mrl(x, y, 3);
+    mrl.TestShow();
+    mrl.run();
 //    Test1();
 
     return 0;
