@@ -25,7 +25,7 @@
 
 namespace HyOct
 {
-    template <typename n_dim, typename n_eqdim, typename n_indim>
+    template <int n_dim, int n_eqdim, int n_indim>
     class OctQP
     {
         ColumnVector m_x0;
@@ -136,6 +136,8 @@ void TestQP(void)
     ColumnVector v = ret(0).vector_value();
     std::cout << ret(0).vector_value();
 
+    ColumnVector r = HyOct::OctQP<1,1,1>(x0, H, q, Aeq, beq, Ain, Bin).minimize();
+    std::cout << r;
 
 }
 
@@ -194,9 +196,9 @@ void Test1(void)
 
 int main (void)
 {
-//    TestQP();
+    TestQP();
 
-    Test1();
+//    Test1();
 
     return 0;
 }
