@@ -5,8 +5,13 @@ CC       = gcc
 CXX      = g++
 CFLAGS   = -g -Wall
 CXXFLAGS = $(CFLAGS) -std=c++0x
+
+LIBOCT_VER = 4.0.0
+
 LIBS     = -lm -loctave -loctinterp
-INCPATH  = -I/usr/include/octave-4.0.0/ -I./ -I/usr/include/octave-4.0.0/octave
+INCPATH  = -I./ \
+		   -I/usr/include/octave-$(LIBOCT_VER)/ \
+		   -I/usr/include/octave-$(LIBOCT_VER)/octave
 DIR     = $(shell pwd)
 
 ###############################################################################
