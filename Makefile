@@ -6,7 +6,7 @@ CXX      = g++
 CFLAGS   = -g -Wall
 CXXFLAGS = $(CFLAGS) -std=c++0x
 LIBS     = -lm -loctave -loctinterp
-INCPATH  = -I/usr/include/octave-4.2.2/ -I./ -I/usr/include/octave-4.2.2/octave
+INCPATH  = -I/usr/include/octave-4.0.0/ -I./ -I/usr/include/octave-4.0.0/octave
 DIR     = $(shell pwd)
 
 ###############################################################################

@@ -58,14 +58,14 @@ namespace HyOct
         }
     };
 
-    class MaxRegressionLine
+    class RegressionLine
     {
         typedef std::vector<double> rn_data;
         std::vector<rn_data> data_list;
 
     public:
         template<typename pos_t>
-        MaxRegressionLine(const pos_t & vx, const pos_t & vy, int n_data)
+        RegressionLine(const pos_t & vx, const pos_t & vy, int n_data)
         {
             data_list.clear();
             for (int i = 0; i < n_data; ++i)
@@ -76,18 +76,6 @@ namespace HyOct
                 data_list.push_back(v);
             }
         }
-
-        void TestShow(void)
-        {
-            auto f = [](rn_data d)
-            {
-                printf("(%.2lf, %.2lf)\n", d[0], d[1]);
-            };
-
-            for_each(data_list.begin(), data_list.end(), f);
-
-        }
-
 
         std::vector<double> run(void) const
         {
