@@ -11,7 +11,9 @@ int main(int argc, const char *argv[])
     double y[3] = {1, 1, 2};
     HyOct::RegressionLine mrl(x, y, 3);
 
-    std::vector<double> r = mrl.run();
+    std::vector<double> r = mrl.max_norm_line();
+    r = mrl.lsm_line();
+
     for (int i = 0; i < 3; ++i)
         printf("r(%d) = %.2lf\n", i, r[i]);
 

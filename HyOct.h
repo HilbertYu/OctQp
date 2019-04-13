@@ -12,6 +12,16 @@
 namespace HyOct
 {
 
+    template<typename T>
+    ColumnVector array2col(const T & a, int n)
+    {
+        ColumnVector ret(n);
+        for (int i = 0; i < n; ++i)
+            ret(i) = a[i];
+        return ret;
+    }
+
+
     class OctQP
     {
         ColumnVector m_x0;
@@ -77,7 +87,30 @@ namespace HyOct
             }
         }
 
-        std::vector<double> run(void) const
+        std::vector<double> lsm_line(void) const
+        {
+            const int n_data = data_list.size();
+
+            Matrix A(n_data, 2);
+            ColumnVector b(n_data);
+            for (int i = 0; i < n_data; ++i)
+            {
+                A(i, 0) = data_list[i][0];
+                A(i, 1) = 1;
+                b(i) = data_list[i][1];
+            }
+
+            ColumnVector w = A.solve(b);
+
+            std::vector<double> ret;
+            ret.push_back(w(0));
+            ret.push_back(-1);
+            ret.push_back(w(1));
+
+            return ret;
+        }
+
+        std::vector<double> max_norm_line(void) const
         {
             const int n_dim = 3;
             const int n_data = data_list.size();
