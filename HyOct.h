@@ -8,6 +8,7 @@
 #include <octave/CMatrix.h>
 #include <octave/Array.h>
 
+#include "RnData.h"
 
 namespace HyOct
 {
@@ -36,70 +37,6 @@ namespace HyOct
 
     std::ostream &operator<<(std::ostream &s, const LineError & le);
 
-    template <int Dim>
-    class RnData
-    {
-        std::vector<double> pt;
-    public:
-        RnData(void):
-            pt(Dim, 0)
-        {
-            assert(Dim >= 0);
-        };
-
-        const double & operator()(int idx) const
-        {
-            return  pt.at(idx);
-        }
-
-        double & operator()(int idx)
-        {
-            return  pt.at(idx);
-        }
-
-        int dim(void) const
-        {
-            return Dim;
-        }
-
-    };
-
-
-    template <int Dim>
-    class RnDataList
-    {
-        typedef RnData<Dim> iDataType;
-        std::vector<iDataType> data_list;
-    public:
-
-        void push_back(const iDataType  & data)
-        {
-            data_list.push_back(data);
-        }
-
-        void clear(void)
-        {
-            data_list.clear();
-
-        }
-
-        size_t size(void) const
-        {
-            return data_list.size();
-        }
-
-        iDataType & operator[](int idx)
-        {
-            return data_list.at(idx);
-        }
-
-        const iDataType & operator[](int idx) const
-        {
-            return data_list.at(idx);
-        }
-
-
-    };
 
     template<typename T>
     ColumnVector array2col(const T & a, int n)
