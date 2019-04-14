@@ -150,6 +150,18 @@ namespace HyOct
         RnDataList<2> data_list;
 
     public:
+        template <typename InitFunc, typename ListT>
+        RegressionLine(InitFunc func, const ListT & dl, int n_data)
+        {
+            data_list.clear();
+            for (int i = 0; i < n_data; ++i)
+            {
+                RnData<2> v = func(dl[i]);
+                data_list.push_back(v);
+            }
+
+        }
+
 
         template<typename pos_t>
         RegressionLine(const pos_t & vx, const pos_t & vy, int n_data)

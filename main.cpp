@@ -32,6 +32,8 @@ int main(int argc, const char *argv[])
     double x[3] = {1, 3, 5};
     double y[3] = {1, 1, 2};
 
+    // RegressionLine(InitFunc func, const ListT & dl, int n_data);
+    // double * pts[2] = {x, y};
 
     HyOct::RegressionLine mrl(x, y, 3);
 
@@ -42,10 +44,6 @@ int main(int argc, const char *argv[])
 
     using namespace std;
     cout << err_cal(x, y, 3, mrl.max_norm_line()) << endl;
-
- //   r = mrl.lsm_line();
-
-
 
 
     return 0;
