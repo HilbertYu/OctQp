@@ -1,9 +1,26 @@
 #include "LineInfo.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 namespace HyOct
 {
+    std::ostream &operator<<(std::ostream &s, const LineError & le)
+    {
+        printf("max = %.6lf, mean = %.6lf, rms = %.6lf\n",
+                le.norm_max,
+                le.norm_mean,
+                le.rms);
+        return s;
+    }
+
+    std::ostream &operator<<(std::ostream &s, const LineEq & line)
+    {
+        printf("%.3lf, %.3lf, %.3lf\n",
+                line.a, line.b, line.c);
+        return s;
+    }
+
     LineError 
     LineError::calError(const RnDataList<2> & dl, const LineEq & line_eq)
     {

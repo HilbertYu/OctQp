@@ -16,8 +16,6 @@ namespace HyOct
     template <int Dim> class RnData;
     template <int Dim> class RnDataList;
 
-
-
     class OctQP
     {
         ColumnVector m_x0;
@@ -56,21 +54,6 @@ namespace HyOct
             }
 
         }
-
-
-        template<typename pos_t>
-        RegressionLine(const pos_t & vx, const pos_t & vy, int n_data)
-        {
-            data_list.clear();
-            for (int i = 0; i < n_data; ++i)
-            {
-                RnData<2> v;
-                v(0) = vx[i];
-                v(1) = vy[i];
-                data_list.push_back(v);
-            }
-        }
-
 
         const RnDataList<2> & dataList(void) const
         {

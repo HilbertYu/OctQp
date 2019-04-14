@@ -3,20 +3,6 @@
 namespace HyOct
 {
 
-    //=============Line Error======
-
-
-    std::ostream &operator<<(std::ostream &s, const LineError & le)
-    {
-        printf("max = %.6lf, mean = %.6lf, rms = %.6lf\n",
-                le.norm_max,
-                le.norm_mean,
-                le.rms);
-        return s;
-    }
-
-    //=========================
-
     OctQP::OctQP(const ColumnVector & x0,
             const Matrix & H,
             const ColumnVector & q,
@@ -52,12 +38,6 @@ namespace HyOct
         return ret(0).vector_value();
     }
 
-    std::ostream &operator<<(std::ostream &s, const LineEq & line)
-    {
-        printf("%.3lf, %.3lf, %.3lf\n",
-                line.a, line.b, line.c);
-        return s;
-    }
 
     //========= RegressionLine
 
