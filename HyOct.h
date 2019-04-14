@@ -40,7 +40,6 @@ namespace HyOct
 
     };
 
-    typedef RnData<2> R2Data;
 
     template <int Dim>
     class RnDataList
@@ -158,7 +157,7 @@ namespace HyOct
             data_list.clear();
             for (int i = 0; i < n_data; ++i)
             {
-                R2Data v;
+                RnData<2> v;
                 v(0) = vx[i];
                 v(1) = vy[i];
                 data_list.push_back(v);
@@ -166,7 +165,7 @@ namespace HyOct
         }
 
         template <int Dim>
-        RegressionLine(const RnDataList<Dim> & arg_data_list):
+        RegressionLine(const RnData<Dim> & arg_data_list):
             data_list(arg_data_list)
         {}
 

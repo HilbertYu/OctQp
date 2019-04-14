@@ -2,6 +2,11 @@
 
 namespace HyOct
 {
+    //=============Rn Data
+
+
+    //=========================
+
     OctQP::OctQP(const ColumnVector & x0,
             const Matrix & H,
             const ColumnVector & q,
