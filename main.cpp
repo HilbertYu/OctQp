@@ -32,10 +32,30 @@ int main(int argc, const char *argv[])
     double x[3] = {1, 3, 5};
     double y[3] = {1, 1, 2};
 
-    // RegressionLine(InitFunc func, const ListT & dl, int n_data);
-    // double * pts[2] = {x, y};
+  //  RegressionLine(InitFunc func, const ListT & dl, int n_data);
 
-    HyOct::RegressionLine mrl(x, y, 3);
+    class EP
+    {
+    public:
+        double * x;
+        double * y;
+    };
+
+    EP ep;
+    ep.x = x;
+    ep.y = y;
+
+    auto init_f = [](int i, const EP & p)->HyOct::RnData<2>
+    {
+        HyOct::RnData<2> ret;
+        ret(0) = p.x[i];
+        ret(1) = p.y[i];
+        return ret;
+    };
+
+
+//    HyOct::RegressionLine mrl(x, y, 3);
+    HyOct::RegressionLine mrl(init_f, ep, 3);
 
     //AX + BY + C = 0;
 

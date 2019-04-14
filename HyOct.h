@@ -156,7 +156,7 @@ namespace HyOct
             data_list.clear();
             for (int i = 0; i < n_data; ++i)
             {
-                RnData<2> v = func(dl[i]);
+                RnData<2> v = func(i, dl);
                 data_list.push_back(v);
             }
 
