@@ -11,6 +11,10 @@
 
 namespace HyOct
 {
+    template <int Dim> class RnData;
+    template <int Dim> class RnDataList;
+    class LineEq;
+
     class LineError
     {
     public:
@@ -25,9 +29,12 @@ namespace HyOct
         double norm_mean;
         double rms;
 
+        static 
+        LineError calError(const RnDataList<2> & dl, const LineEq & line_eq);
 
     };
 
+    std::ostream &operator<<(std::ostream &s, const LineError & le);
 
     template <int Dim>
     class RnData
