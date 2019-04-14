@@ -15,13 +15,10 @@ typedef struct
     point_ctx_t pt[32];
     int n_pts;
 } point_queue_t;
-//===========================
 
 
-int main(int argc, const char *argv[])
+void TestInitPQ(point_queue_t & pq)
 {
-    point_queue_t pq;
-
     double x[3] = {1, 3, 5};
     double y[3] = {1, 1, 2};
 
@@ -34,28 +31,43 @@ int main(int argc, const char *argv[])
         pq.n_pts = 3;
     }
 
+}
+
+
+//===========================
+
+
+int main(int argc, const char *argv[])
+{
+    //Init PQ to demo
+    point_queue_t pq;
+    TestInitPQ(pq);
+
+
+    using namespace HyOct;
+    using namespace std;
+
     auto init_f = [](int i, const point_queue_t & apq)
-        ->HyOct::RnData<2>
+        ->RnData<2>
     {
-        HyOct::RnData<2> ret;
+        RnData<2> ret;
         ret(0) = apq.pt[i].coord[0];
         ret(1) = apq.pt[i].coord[1];
         return ret;
     };
 
 
-    HyOct::RegressionLine mrl(init_f, pq, pq.n_pts);
+    RegressionLine rl(init_f, pq, pq.n_pts);
 
     //AX + BY + C = 0;
-    std::cout << mrl.max_norm_line();
-    std::cout << mrl.lsm_line();
+    cout << rl.max_norm_line();
+    cout << rl.lsm_line();
 
-    using namespace std;
 
-    HyOct::LineError err_ret =
-        HyOct::LineError::calError(mrl.dataList(), mrl.max_norm_line());
+    LineError err_ret =
+        LineError::calError(rl.dataList(), rl.max_norm_line());
 
-    std::cout << err_ret;
+    cout << err_ret;
 
     return 0;
 }
