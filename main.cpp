@@ -47,6 +47,7 @@ int main(int argc, const char *argv[])
     using namespace HyOct;
     using namespace std;
 
+    //init callback function
     auto init_f = [](int i, const point_queue_t & apq)
         ->RnData<2>
     {
@@ -59,15 +60,22 @@ int main(int argc, const char *argv[])
 
     RegressionLine rl(init_f, pq, pq.n_pts);
 
-    //AX + BY + C = 0;
-    cout << rl.max_norm_line();
-    cout << rl.lsm_line();
+    //calculate
+    LineEq max_line = rl.max_norm_line();
+    LineEq lsm_line = rl.lsm_line();
 
+    //(A,B,C) means AX + BY + C = 0
+    cout << max_line;
+    cout << lsm_line;
 
-    LineError err_ret =
-        LineError::calError(rl.dataList(), rl.max_norm_line());
+    LineError err_ret_max_line =
+        LineError::calError(rl.dataList(), max_line);
 
-    cout << err_ret;
+    LineError err_ret_lsm_line =
+        LineError::calError(rl.dataList(), lsm_line);
+
+    cout << err_ret_max_line;
+    cout << err_ret_lsm_line;
 
     return 0;
 }
