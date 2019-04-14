@@ -60,19 +60,23 @@ int main(int argc, const char *argv[])
 
     RegressionLine rl(init_f, pq, pq.n_pts);
 
-    //calculate
+    //get the lines
     LineEq max_line = rl.max_norm_line();
     LineEq lsm_line = rl.lsm_line();
+
 
     //(A,B,C) means AX + BY + C = 0
     cout << max_line;
     cout << lsm_line;
 
+    //get the errors
+    const RnDataList<2> & rn_data = rl.dataList();
+
     LineError err_ret_max_line =
-        LineError::calError(rl.dataList(), max_line);
+        LineError::calError(rn_data, max_line);
 
     LineError err_ret_lsm_line =
-        LineError::calError(rl.dataList(), lsm_line);
+        LineError::calError(rn_data, lsm_line);
 
     cout << err_ret_max_line;
     cout << err_ret_lsm_line;
