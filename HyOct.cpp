@@ -54,9 +54,9 @@ namespace HyOct
         ColumnVector b(n_data);
         for (int i = 0; i < n_data; ++i)
         {
-            A(i, 0) = data_list[i][0];
+            A(i, 0) = data_list[i](0);
             A(i, 1) = 1;
-            b(i) = data_list[i][1];
+            b(i) = data_list[i](1);
         }
 
         ColumnVector w = A.solve(b);
@@ -91,7 +91,7 @@ namespace HyOct
         {
             for (int axis = 0; axis < n_dim - 1; ++axis)
             {
-                T(i, axis) = data_list.at(i).at(axis);
+                T(i, axis) = data_list.at(i)(axis);
             }
         }
 

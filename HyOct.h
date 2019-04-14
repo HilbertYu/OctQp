@@ -12,6 +12,31 @@
 namespace HyOct
 {
 
+    template <int dim>
+    class RnData
+    {
+        std::vector<double> pt;
+    public:
+        RnData(void):
+            pt(dim, 0)
+        {
+        };
+
+        const double & operator()(int idx) const
+        {
+            return  pt.at(idx);
+        }
+
+        double & operator()(int idx)
+        {
+            return  pt.at(idx);
+        }
+
+
+    };
+
+    typedef RnData<2> R2Data;
+
     template<typename T>
     ColumnVector array2col(const T & a, int n)
     {
@@ -82,8 +107,7 @@ namespace HyOct
 
     class RegressionLine
     {
-        typedef std::vector<double> rn_data;
-        std::vector<rn_data> data_list;
+        std::vector<R2Data> data_list;
 
     public:
 
@@ -93,9 +117,9 @@ namespace HyOct
             data_list.clear();
             for (int i = 0; i < n_data; ++i)
             {
-                rn_data v;
-                v.push_back(vx[i]);
-                v.push_back(vy[i]);
+                R2Data v;
+                v(0) = vx[i];
+                v(1) = vy[i];
                 data_list.push_back(v);
             }
         }
@@ -109,3 +133,4 @@ namespace HyOct
 }
 
 #endif /* end of include guard: HYOCT_H */
+
