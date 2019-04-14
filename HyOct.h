@@ -165,6 +165,12 @@ namespace HyOct
             }
         }
 
+        template <int Dim>
+        RegressionLine(const RnDataList<Dim> & arg_data_list):
+            data_list(arg_data_list)
+        {}
+
+
         LineEq lsm_line(void) const;
 
         LineEq max_norm_line(void) const;
