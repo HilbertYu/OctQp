@@ -9,43 +9,13 @@
 #include <octave/Array.h>
 
 #include "RnData.h"
+#include "LineInfo.h"
 
 namespace HyOct
 {
     template <int Dim> class RnData;
     template <int Dim> class RnDataList;
-    class LineEq;
 
-    class LineError
-    {
-    public:
-        LineError(void):
-            norm_max(-1),
-            norm_mean(-1),
-            rms(-1)
-        {
-        }
-
-        double norm_max;
-        double norm_mean;
-        double rms;
-
-        static 
-        LineError calError(const RnDataList<2> & dl, const LineEq & line_eq);
-
-    };
-
-    std::ostream &operator<<(std::ostream &s, const LineError & le);
-
-
-    template<typename T>
-    ColumnVector array2col(const T & a, int n)
-    {
-        ColumnVector ret(n);
-        for (int i = 0; i < n; ++i)
-            ret(i) = a[i];
-        return ret;
-    }
 
 
     class OctQP
@@ -68,42 +38,6 @@ namespace HyOct
 
         ColumnVector minimize(void);
     };
-
-    class LineEq
-    {
-        // LineEq  a*X + b*Y + c = 0
-    public:
-        double a;
-        double b;
-        double c;
-
-        template <typename T>
-        LineEq(const T & v):
-            a(v[0]),
-            b(v[1]),
-            c(v[2])
-        {
-
-        }
-
-        LineEq(double _a, double _b, double _c):
-            a(_a),
-            b(_b),
-            c(_c)
-        {}
-
-
-        LineEq(void):
-            a(0),
-            b(0),
-            c(0)
-        {}
-
-
-       friend std::ostream &operator<<(std::ostream &s, const LineEq &);
-    };
-
-
 
 
     class RegressionLine

@@ -1,6 +1,11 @@
 #ifndef RNDATA_H
 #define RNDATA_H
 
+#include <vector>
+#include <assert.h>
+#include <iostream>
+#include <math.h>
+
 namespace HyOct
 {
     template <int Dim>
@@ -21,7 +26,8 @@ namespace HyOct
 
         double & operator()(int idx)
         {
-            return  pt.at(idx);
+            const RnData & x = *this;
+            return  const_cast<double&>(x(idx));
         }
 
         int dim(void) const
@@ -47,7 +53,6 @@ namespace HyOct
         void clear(void)
         {
             data_list.clear();
-
         }
 
         size_t size(void) const
@@ -64,11 +69,9 @@ namespace HyOct
         {
             return data_list.at(idx);
         }
-
-
     };
 
+};
 
-}
 #endif /* end of include guard: RNDATA_H */
 
