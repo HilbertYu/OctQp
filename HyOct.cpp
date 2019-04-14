@@ -2,8 +2,17 @@
 
 namespace HyOct
 {
-    //=============Rn Data
+    //=============Line Error======
 
+
+    std::ostream &operator<<(std::ostream &s, const LineError & le)
+    {
+        printf("max = %.6lf, mean = %.6lf, rms = %.6lf\n",
+                le.norm_max,
+                le.norm_mean,
+                le.rms);
+        return s;
+    }
 
     //=========================
 
