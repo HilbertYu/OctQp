@@ -176,6 +176,12 @@ namespace HyOct
             }
         }
 
+
+        const RnDataList<2> & dataList(void) const
+        {
+            return data_list;
+        }
+
         template <int Dim>
         RegressionLine(const RnData<Dim> & arg_data_list):
             data_list(arg_data_list)

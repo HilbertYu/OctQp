@@ -26,6 +26,30 @@ double err_cal(const T & vx, const T & vy, int n_data, const HyOct::LineEq & lin
 
 }
 
+double err_cal2(const HyOct::RnDataList<2> & dl, const HyOct::LineEq & line_eq)
+{
+    double ret_err = -1;
+
+    const double A = line_eq.a;
+    const double B = line_eq.b;
+    const double C = line_eq.c;
+
+    int n_data = dl.size();
+
+    double w = sqrt(A*A + B*B);
+
+    for (int i = 0; i < n_data; ++i)
+    {
+        const HyOct::RnData<2> & pt = dl[i];
+        double r = fabs(A*pt(0) + B*pt(1) + C)/w;
+        if (ret_err < r)
+            ret_err = r;
+    }
+
+    return ret_err;
+
+}
+
 int main(int argc, const char *argv[])
 {
 
@@ -64,6 +88,7 @@ int main(int argc, const char *argv[])
 
     using namespace std;
     cout << err_cal(x, y, 3, mrl.max_norm_line()) << endl;
+    cout << err_cal2(mrl.dataList(), mrl.max_norm_line()) << endl;
 
 
     return 0;
