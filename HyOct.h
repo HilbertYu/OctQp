@@ -11,6 +11,23 @@
 
 namespace HyOct
 {
+    class LineError
+    {
+    public:
+        LineError(void):
+            norm_max(-1),
+            norm_mean(-1),
+            rms(-1)
+        {
+        }
+
+        double norm_max;
+        double norm_mean;
+        double rms;
+
+
+    };
+
 
     template <int Dim>
     class RnData

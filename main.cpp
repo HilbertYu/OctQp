@@ -26,9 +26,11 @@ double err_cal(const T & vx, const T & vy, int n_data, const HyOct::LineEq & lin
 
 }
 
-double err_cal2(const HyOct::RnDataList<2> & dl, const HyOct::LineEq & line_eq)
+HyOct::LineError
+err_cal2(
+        const HyOct::RnDataList<2> & dl,
+        const HyOct::LineEq & line_eq)
 {
-    double ret_err = -1;
 
     const double A = line_eq.a;
     const double B = line_eq.b;
@@ -38,15 +40,29 @@ double err_cal2(const HyOct::RnDataList<2> & dl, const HyOct::LineEq & line_eq)
 
     double w = sqrt(A*A + B*B);
 
+    double ret_max_err = -1;
+    double ret_mean_err = 0;
+    double ret_rms_err = 0;
+
+
     for (int i = 0; i < n_data; ++i)
     {
         const HyOct::RnData<2> & pt = dl[i];
         double r = fabs(A*pt(0) + B*pt(1) + C)/w;
-        if (ret_err < r)
-            ret_err = r;
+        if (ret_max_err < r)
+            ret_max_err = r;
+
+        ret_mean_err += r;
+        ret_rms_err += r*r;
+
     }
 
-    return ret_err;
+    HyOct::LineError ret;
+    ret.norm_max = ret_max_err;
+    ret.norm_mean = ret_mean_err/n_data;
+    ret.rms = sqrt(ret_rms_err/n_data);
+
+    return ret;
 
 }
 
@@ -88,8 +104,14 @@ int main(int argc, const char *argv[])
 
     using namespace std;
     cout << err_cal(x, y, 3, mrl.max_norm_line()) << endl;
-    cout << err_cal2(mrl.dataList(), mrl.max_norm_line()) << endl;
 
+    HyOct::LineError err_ret =
+        err_cal2(mrl.dataList(), mrl.max_norm_line());
+
+    printf("max = %.6lf, mean = %.6lf, rms = %.6lf\n",
+        err_ret.norm_max,
+        err_ret.norm_mean,
+        err_ret.rms);
 
     return 0;
 }
