@@ -91,7 +91,7 @@ namespace HyOct
         {
             for (int axis = 0; axis < n_dim - 1; ++axis)
             {
-                T(i, axis) = data_list.at(i)(axis);
+                T(i, axis) = data_list[i](axis);
             }
         }
 
