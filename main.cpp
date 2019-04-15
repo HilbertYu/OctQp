@@ -3,6 +3,9 @@
 #include <assert.h>
 #include <algorithm>
 #include "HyOct.h"
+#include <string>
+#include <stdio.h>
+#include <fstream>
 
 //========= sample =======
 typedef struct
@@ -36,6 +39,44 @@ void TestInitPQ(point_queue_t & pq)
 
 //===========================
 
+HyOct::RnDataList<2> R2DataFileLoader(const std::string & file_name)
+{
+    using namespace HyOct;
+    using namespace std;
+
+    RnDataList<2> ret;
+
+    ifstream ifs(file_name);
+    if (ifs.bad())
+    {
+        fprintf(stderr, "error\n");
+        exit(-1);
+    }
+
+    string line;
+    while (getline(ifs, line))
+    {
+        if (ifs.eof())
+            break;
+
+        if (line.size() == 0)
+            break;
+
+        int coord[2] = {-1, -1};
+        int r = sscanf(line.c_str(), "%d,%d\n", coord, coord+1);
+        assert(r == 2);
+
+        RnData<2> v;
+        v(0) = coord[0];
+        v(1) = coord[1];
+        ret.push_back(v);
+    }
+
+    return ret;
+
+}
+
+
 
 int main(int argc, const char *argv[])
 {
@@ -57,6 +98,19 @@ int main(int argc, const char *argv[])
         return ret;
     };
 
+
+    {
+        const char * file_name = "pts";
+        RnDataList<2> file_data = R2DataFileLoader(file_name);
+        for (size_t i = 0; i < file_data.size(); ++i)
+        {
+            double x = file_data[i](0);
+            double y = file_data[i](1);
+            printf("%.3lf, %.3lf\n", x, y);
+
+        }
+        return 0;
+    }
 
     RegressionLine rl(init_f, pq, pq.n_pts);
 
