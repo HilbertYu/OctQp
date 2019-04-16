@@ -38,56 +38,11 @@ void TestInitPQ(point_queue_t & pq)
 }
 
 
-//===========================
-
-HyOct::RnDataList<2> R2DataFileLoader(const std::string & file_name)
+HyOct::RegressionLine TestInitRLByFunction(void)
 {
     using namespace HyOct;
-    using namespace std;
-
-    RnDataList<2> ret;
-
-    ifstream ifs(file_name);
-    if (ifs.bad())
-    {
-        fprintf(stderr, "error\n");
-        exit(-1);
-    }
-
-    string line;
-    while (getline(ifs, line))
-    {
-        if (ifs.eof())
-            break;
-
-        if (line.size() == 0)
-            break;
-
-        int coord[2] = {-1, -1};
-        int r = sscanf(line.c_str(), "%d,%d\n", coord, coord+1);
-        assert(r == 2);
-
-        RnData<2> v;
-        v(0) = coord[0];
-        v(1) = coord[1];
-        ret.push_back(v);
-    }
-
-    return ret;
-
-}
-
-
-
-int main(int argc, const char *argv[])
-{
-    //Init PQ to demo
     point_queue_t pq;
     TestInitPQ(pq);
-
-
-    using namespace HyOct;
-    using namespace std;
 
     //init callback function
     auto init_f = [](int i, const point_queue_t & apq)
@@ -99,21 +54,44 @@ int main(int argc, const char *argv[])
         return ret;
     };
 
+    return RegressionLine(init_f, pq, pq.n_pts);
+}
 
-    const char * file_name = "pts";
-    RnDataList<2> file_data = R2DataFileLoader(file_name);
+
+void TestShowInfo(const std::vector<HyOct::LineEq> & lines, const HyOct::RnDataList<2> & rn_data)
+{
+    using namespace std;
+    using namespace HyOct;
+
+    vector<string> ts;
+    ts.push_back("max-line");
+    ts.push_back("lsm-line");
+    ts.push_back("tsr-line");
+
+    for (int i: {0,1, 2})
     {
-       //for (size_t i = 0; i < file_data.size(); ++i)
-        for (auto data: file_data)
-        {
-            double x = data(0);
-            double y = data(1);
-        //    printf("PT,%.3lf, %.3lf\n", x, y);
+        printf("=== %s ===\n", ts[i].c_str());
 
-        }
+        LineError el = LineError::calError(rn_data, lines[i]);
+
+        cout << el << endl;
     }
 
-    //RegressionLine rl(init_f, pq, pq.n_pts);
+}
+
+
+int main(int argc, const char *argv[])
+{
+    //Init PQ to demo
+
+
+    using namespace HyOct;
+    using namespace std;
+
+
+
+    const char * file_name = "pts";
+    RnDataList<2> file_data = RnDataList<2>::R2DataFileLoader(file_name);
     RegressionLine rl(file_data);
 
     //get the lines
@@ -131,35 +109,15 @@ int main(int argc, const char *argv[])
     //get the errors
     const RnDataList<2> & rn_data = rl.dataList();
 
-    LineError err_ret_max_line =
-        LineError::calError(rn_data, max_line);
 
-    LineError err_ret_lsm_line =
-        LineError::calError(rn_data, lsm_line);
+    vector<LineEq> lines;
 
-    {
-        vector<LineEq> lines;
-        lines.push_back(max_line);
-        lines.push_back(lsm_line);
-        lines.push_back(tsr_line);
+    lines.push_back(max_line);
+    lines.push_back(lsm_line);
+    lines.push_back(tsr_line);
 
-        vector<string> ts;
-        ts.push_back("max-line");
-        ts.push_back("lsm-line");
-        ts.push_back("tsr-line");
+    TestShowInfo(lines, rn_data);
 
-        for (int i: {0,1, 2})
-        {
-            printf("=== %s ===\n", ts[i].c_str());
-
-            LineError el = LineError::calError(rn_data, lines[i]);
-
-            cout << el << endl;
-        }
-
-
-
-    }
 
 
 

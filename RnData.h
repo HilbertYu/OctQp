@@ -4,6 +4,7 @@
 #include <vector>
 #include <assert.h>
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 namespace HyOct
@@ -78,6 +79,42 @@ namespace HyOct
         const iDataType & operator[](int idx) const
         {
             return data_list.at(idx);
+        }
+
+        static RnDataList<2> R2DataFileLoader(const std::string & file_name)
+        {
+            using namespace std;
+
+            RnDataList<2> ret;
+
+            ifstream ifs(file_name);
+            if (ifs.bad())
+            {
+                fprintf(stderr, "error\n");
+                exit(-1);
+            }
+
+            string line;
+            while (getline(ifs, line))
+            {
+                if (ifs.eof())
+                    break;
+
+                if (line.size() == 0)
+                    break;
+
+                int coord[2] = {-1, -1};
+                int r = sscanf(line.c_str(), "%d,%d\n", coord, coord+1);
+                assert(r == 2);
+
+                RnData<2> v;
+                v(0) = coord[0];
+                v(1) = coord[1];
+                ret.push_back(v);
+            }
+
+            return ret;
+
         }
     };
 
