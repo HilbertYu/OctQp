@@ -1,4 +1,5 @@
 #include "HyOct.h"
+#include <thread>
 
 namespace HyOct
 {
@@ -102,5 +103,103 @@ namespace HyOct
         return LineEq(r(0), r(1), r(2));
     }
 
+
+    class TSRCtxBase
+    {
+    public:
+        virtual double operator()(const HyOct::RnDataList<2> & dl, int i, int j) = 0;
+        double ans;
+
+        static double repeatMed(TSRCtxBase & func, const HyOct::RnDataList<2> &dl)
+        {
+            const int N = dl.size();
+
+            std::vector<double> ret_vec(N, 0);
+            std::vector<double> vec(N, 0);
+            for (int i = 0; i < N; ++i)
+            {
+                for (int j = 0; j < N; ++j)
+                {
+                    ret_vec[j] = (func(dl, i, j));
+                }
+
+                nth_element(ret_vec.begin(), ret_vec.begin() + N/2,  ret_vec.end());
+                vec[i] = (ret_vec.at(N/2));
+            }
+
+            nth_element(vec.begin(), vec.begin() + N/2,  vec.end());
+            func.ans = vec[N/2];
+            return vec[N/2];
+        }
+
+        static void *repeatMedPtr(void* args)
+        {
+            TSRCtxBase::ThArgs * pargs = (TSRCtxBase::ThArgs*)args;
+            TSRCtxBase::repeatMed(pargs->b, pargs->dl);
+
+            return NULL;
+        }
+
+        struct ThArgs
+        {
+        public:
+            ThArgs(TSRCtxBase &mb, const HyOct::RnDataList<2> & mdl):
+                b(mb), dl(mdl)
+        {}
+
+            TSRCtxBase &b;
+            const HyOct::RnDataList<2> &dl;
+        };
+
+    };
+
+
+    LineEq RegressionLine::tsr_line(void) const
+    {
+        using namespace std;
+        const RnDataList<2> & dl = data_list;
+
+        class TSRCtxSlop: public TSRCtxBase
+        {
+        public:
+            double operator()(const HyOct::RnDataList<2> & dl, int i, int j)
+            { 
+                const double dem  = dl[j](0) - dl[i](0);
+                return (dem == 0)? DBL_MAX: (dl[j](1) - dl[i](1))/dem;
+            }
+        };
+
+        class TSRCtxIntp: public TSRCtxBase
+        {
+        public:
+            double operator()(const HyOct::RnDataList<2> & dl, int i, int j)
+            { 
+                const double dem  = dl[j](0) - dl[i](0);
+                return (dem == 0)? DBL_MAX: 
+                    (dl[j](0)*dl[i](1) - dl[i](0)*dl[j](1))/dem;
+            }
+        };
+
+        TSRCtxSlop tslp;
+        TSRCtxIntp titp;
+
+        TSRCtxBase::ThArgs arg_ts(tslp, dl);
+        TSRCtxBase::ThArgs arg_ti(titp, dl);
+
+        pthread_t ths, thi;
+
+        pthread_create(&ths, NULL, TSRCtxBase::repeatMedPtr, &arg_ts);
+        pthread_create(&thi, NULL, TSRCtxBase::repeatMedPtr, &arg_ti);
+
+        pthread_join(ths, NULL);
+        pthread_join(thi, NULL);
+
+        double ret_slop = tslp.ans;
+        double ret_intp = titp.ans;
+
+        HyOct::LineEq ret_eq = HyOct::LineEq(ret_slop, -1, ret_intp);
+        return ret_eq;
+
+    }
 
 };

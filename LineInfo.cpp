@@ -16,8 +16,11 @@ namespace HyOct
 
     std::ostream &operator<<(std::ostream &s, const LineEq & line)
     {
-        printf("%.3lf, %.3lf, %.3lf\n",
-                line.a, line.b, line.c);
+        // printf("%.5lf, %.5lf, %.5lf\n",
+        //         line.a, line.b, line.c);
+
+        printf("%.5lf, %.5lf, %.5lf\n",
+                line.a/line.b, 1.0, line.c/line.b);
         return s;
     }
 
