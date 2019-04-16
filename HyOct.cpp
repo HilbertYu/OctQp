@@ -1,4 +1,5 @@
 #include "HyOct.h"
+#include <thread>
 
 namespace HyOct
 {
@@ -102,11 +103,49 @@ namespace HyOct
         return LineEq(r(0), r(1), r(2));
     }
 
+
+ //   template <typename Func_t, typename T>
+    //void repeatMed(T & vec, Func_t func, const RnDataList<2> &dl)
+    //void repeatMed(T & vec, Func_t func)
+    
+    class TSRCtxBase
+    {
+    public:
+        virtual double cal_func(const HyOct::RnDataList<2> & dl, int i, int j) = 0;
+
+        double repeatMed(std::vector<double> & vec, const HyOct::RnDataList<2> & dl)
+        {
+            const int N = dl.size();
+
+            for (int i = 0; i < N; ++i)
+            {
+                std::vector<double> tmp_col_s(N, 0);
+                for (int j = 0; j < N; ++j)
+                {
+                    tmp_col_s[j] = (cal_func(dl, i, j));
+                }
+
+                nth_element(tmp_col_s.begin(), tmp_col_s.begin() + N/2,  tmp_col_s.end());
+                vec[i] = (tmp_col_s.at(N/2));
+            }
+
+            nth_element(vec.begin(), vec.begin() + N/2,  vec.end());
+            return vec[N/2];
+
+        }
+    };
+
+    double repeatMed(TSRCtxBase & b, std::vector<double> & vec, const HyOct::RnDataList<2> &dl)
+    {
+        return b.repeatMed(vec, dl);
+    }
+
+
     LineEq RegressionLine::tsr_line(void) const
     {
         const RnDataList<2> & dl = data_list;
 
-        auto slop = [&dl](int i, int j)->double
+        auto slop = [](const RnDataList<2> & dl, int i, int j)->double
         {
             double ret = 0;
             double dem  = dl[j](0) - dl[i](0);
@@ -118,7 +157,7 @@ namespace HyOct
             return ret;
         };
 
-        auto intp = [&dl](int i, int j)->double
+        auto intp = [](const RnDataList<2> & dl, int i, int j)->double
         {
             double ret = 0;
             double dem  = dl[j](0) - dl[i](0);
@@ -138,34 +177,47 @@ namespace HyOct
         vector<double> col_i(N, 0);
 
 
-        for (int i = 0; i < N; ++i)
+        class TSRCtxSlop: public TSRCtxBase
         {
-            vector<double> tmp_col_s(N, 0);
-            vector<double> tmp_col_i(N, 0);
+        public:
+            double cal_func(const HyOct::RnDataList<2> & dl, int i, int j)
+            { 
+                double ret = 0;
+                double dem  = dl[j](0) - dl[i](0);
 
-            for (int j = 0; j < N; ++j)
-            {
+                if (dem == 0)
+                    return 1024;
 
-                tmp_col_s[j] = (slop(i, j));
-                tmp_col_i[j] = (intp(i, j));
+                ret = (dl[j](1) - dl[i](1))/dem;
+                return ret;
             }
+        };
 
-            nth_element(tmp_col_s.begin(), tmp_col_s.begin() + N/2,  tmp_col_s.end());
-            nth_element(tmp_col_i.begin(), tmp_col_i.begin() + N/2,  tmp_col_i.end());
+        class TSRCtxIntp: public TSRCtxBase
+        {
+        public:
+            double cal_func(const HyOct::RnDataList<2> & dl, int i, int j)
+            { 
+                double ret = 0;
+                double dem  = dl[j](0) - dl[i](0);
 
-            col_s[i] = (tmp_col_s.at(N/2));
-            col_i[i] = (tmp_col_i.at(N/2));
-        }
+                if (dem == 0)
+                    return 1024;
+
+                ret = (dl[j](0)*dl[i](1) - dl[i](0)*dl[j](1))/dem;
+                return ret;
+            }
+        };
 
 
-        // for (int i = 0; i < N; ++i)
-        // {
-        //     printf("T,%.3lf\n", col_i[i]);
-        //
-        // }
+        TSRCtxSlop tslp;
+        TSRCtxIntp titp;
 
-        nth_element(col_s.begin(), col_s.begin() + N/2,  col_s.end());
-        nth_element(col_i.begin(), col_i.begin() + N/2,  col_i.end());
+        thread th_slop(repeatMed, std::ref(tslp),  std::ref(col_s), std::cref(dl));
+        thread th_intp(repeatMed, std::ref(titp),  std::ref(col_i), std::cref(dl));
+
+        th_slop.join();
+        th_intp.join();
 
 
         HyOct::LineEq ret_eq = HyOct::LineEq(col_s[N/2], -1,  col_i[N/2]);

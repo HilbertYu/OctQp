@@ -8,7 +8,7 @@ CXXFLAGS = $(CFLAGS) -std=c++0x -O3
 
 LIBOCT_VER = 4.2.2
 
-LIBS     = -lm -loctave -loctinterp
+LIBS     = -lm -loctave -loctinterp -lpthread
 INCPATH  = -I./ \
 		   -I/usr/include/octave-$(LIBOCT_VER)/ \
 		   -I/usr/include/octave-$(LIBOCT_VER)/octave

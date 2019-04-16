@@ -6,6 +6,7 @@
 #include <string>
 #include <stdio.h>
 #include <fstream>
+#include <thread>
 
 //========= sample =======
 typedef struct
@@ -80,6 +81,27 @@ HyOct::RnDataList<2> R2DataFileLoader(const std::string & file_name)
 
 int main(int argc, const char *argv[])
 {
+    if (0)
+    {
+        using namespace std;
+        int x = 10;
+        auto f = [](int&  x)->int
+        {
+            printf("x = %d\n", x);
+            x = x*x;
+            return x;
+        };
+
+
+
+
+        // thread th(f, std::ref(x));
+        // th.join();
+        // printf("ret = %d\n",x);
+
+
+        return 0;
+    }
     //Init PQ to demo
     point_queue_t pq;
     TestInitPQ(pq);
@@ -99,7 +121,7 @@ int main(int argc, const char *argv[])
     };
 
 
-    const char * file_name = "pts3";
+    const char * file_name = "pts";
     RnDataList<2> file_data = R2DataFileLoader(file_name);
     {
         for (size_t i = 0; i < file_data.size(); ++i)
@@ -124,6 +146,7 @@ int main(int argc, const char *argv[])
     cout << "max-line eq : " << max_line;
     cout << "lsm-line eq : " << lsm_line;
     cout << "tsr-line eq : " << tsr_line;
+    cout << endl;
 
     //get the errors
     const RnDataList<2> & rn_data = rl.dataList();
@@ -133,9 +156,6 @@ int main(int argc, const char *argv[])
 
     LineError err_ret_lsm_line =
         LineError::calError(rn_data, lsm_line);
-
-    cout << err_ret_max_line;
-    cout << err_ret_lsm_line;
 
     {
         vector<LineEq> lines;
