@@ -4,7 +4,7 @@
 CC       = gcc
 CXX      = g++
 CFLAGS   = -g -Wall
-CXXFLAGS = $(CFLAGS) -std=c++0x
+CXXFLAGS = $(CFLAGS) -std=c++0x -O3
 
 LIBOCT_VER = 4.2.2
 
