@@ -82,13 +82,8 @@ void TestShowInfo(const std::vector<HyOct::LineEq> & lines, const HyOct::RnDataL
 
 int main(int argc, const char *argv[])
 {
-    //Init PQ to demo
-
-
     using namespace HyOct;
     using namespace std;
-
-
 
     const char * file_name = "pts";
     RnDataList<2> file_data = RnDataList<2>::R2DataFileLoader(file_name);
@@ -117,10 +112,6 @@ int main(int argc, const char *argv[])
     lines.push_back(tsr_line);
 
     TestShowInfo(lines, rn_data);
-
-
-
-
 
     return 0;
 }
