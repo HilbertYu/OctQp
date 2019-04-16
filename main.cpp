@@ -99,7 +99,7 @@ int main(int argc, const char *argv[])
     };
 
 
-    const char * file_name = "pts";
+    const char * file_name = "pts3";
     RnDataList<2> file_data = R2DataFileLoader(file_name);
     {
         for (size_t i = 0; i < file_data.size(); ++i)
@@ -125,7 +125,6 @@ int main(int argc, const char *argv[])
     cout << "lsm-line eq : " << lsm_line;
     cout << "tsr-line eq : " << tsr_line;
 
-    return 0;
     //get the errors
     const RnDataList<2> & rn_data = rl.dataList();
 
@@ -137,6 +136,33 @@ int main(int argc, const char *argv[])
 
     cout << err_ret_max_line;
     cout << err_ret_lsm_line;
+
+    {
+        vector<LineEq> lines;
+        lines.push_back(max_line);
+        lines.push_back(lsm_line);
+        lines.push_back(tsr_line);
+
+        vector<string> ts;
+        ts.push_back("max-line");
+        ts.push_back("lsm-line");
+        ts.push_back("tsr-line");
+
+        for (int i = 0; i < 3; ++i)
+        {
+            printf("=== %s ===\n", ts[i].c_str());
+
+            LineError el = LineError::calError(rn_data, lines[i]);
+
+            cout << el << endl;
+        }
+
+
+
+    }
+
+
+
 
     return 0;
 }
