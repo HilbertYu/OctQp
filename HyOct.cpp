@@ -140,6 +140,33 @@ namespace HyOct
         return b.repeatMed(vec, dl);
     }
 
+    struct ThArgs
+    {
+        public:
+
+            ThArgs(TSRCtxBase &mb, std::vector<double> & mvec, const HyOct::RnDataList<2> & mdl):
+                b(mb),
+                vec(mvec),
+                dl(mdl)
+        {}
+
+
+        TSRCtxBase &b;
+        std::vector<double> & vec;
+        const HyOct::RnDataList<2> &dl;
+
+    };
+
+
+    void *repeatMedPtr(void* args)
+    {
+        ThArgs * pargs = (ThArgs*)args;
+        repeatMed(pargs->b, pargs->vec, pargs->dl);
+
+        return NULL;
+
+    }
+
 
     LineEq RegressionLine::tsr_line(void) const
     {
@@ -189,6 +216,20 @@ namespace HyOct
         TSRCtxIntp titp;
 
 #if 1
+        ThArgs arg_ts(tslp, col_s, dl);
+        ThArgs arg_ti(titp, col_i, dl);
+
+        pthread_t ths;
+        pthread_t thi;
+
+        pthread_create(&ths, NULL, repeatMedPtr, &arg_ts);
+        pthread_create(&thi, NULL, repeatMedPtr, &arg_ti);
+
+        pthread_join(ths, NULL);
+        pthread_join(thi, NULL);
+#endif
+
+#if 0
         fprintf(stderr, "to go slop\n");
         thread th_slop(repeatMed, std::ref(tslp),  std::ref(col_s), std::cref(dl));
         fprintf(stderr, "go slop\n");
@@ -200,8 +241,10 @@ namespace HyOct
         printf("don!\n");
 #endif
 
-        // repeatMed((tslp),  (col_s), (dl));
-        // repeatMed((titp),  (col_i), (dl));
+#if 0
+        repeatMed((tslp),  (col_s), (dl));
+        repeatMed((titp),  (col_i), (dl));
+#endif
 
         HyOct::LineEq ret_eq = HyOct::LineEq(col_s[N/2], -1,  col_i[N/2]);
         return ret_eq;
