@@ -6,7 +6,7 @@ CXX      = g++
 CFLAGS   = -g -Wall
 CXXFLAGS = $(CFLAGS) -std=c++0x
 
-LIBOCT_VER = 4.0.0
+LIBOCT_VER = 4.2.2
 
 LIBS     = -lm -loctave -loctinterp
 INCPATH  = -I./ \

@@ -70,6 +70,36 @@ namespace HyOct
 
         LineEq max_norm_line(void) const;
 
+        LineEq tsr_line(void) const
+        {
+            RnDataList<2> & dl = data_list;
+
+            auto slop = [&dl](int i, int j)->double
+            {
+                double ret = 0;
+                double dem  = dl[j](0) - dl[i](0);
+
+                if (dem == 0)
+                    ret = 1024;
+
+                ret = (dl[j][1] - dl[i][1])/dem;
+                return ret;
+            }
+
+            auto intp = [&dl](int i, int j)->double
+            {
+                double ret = 0;
+                double dem  = dl[j](0) - dl[i](0);
+
+                if (dem == 0)
+                    ret = 1024;
+
+                ret = (dl[j](0)*dl[i][1] - dl[i](0)*dl[j][1])/dem;
+                return ret;
+            }
+
+        }
+
 
     };
 }
