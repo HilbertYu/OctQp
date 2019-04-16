@@ -81,27 +81,6 @@ HyOct::RnDataList<2> R2DataFileLoader(const std::string & file_name)
 
 int main(int argc, const char *argv[])
 {
-    if (0)
-    {
-        using namespace std;
-        int x = 10;
-        auto f = [](int&  x)->int
-        {
-            printf("x = %d\n", x);
-            x = x*x;
-            return x;
-        };
-
-
-
-
-        // thread th(f, std::ref(x));
-        // th.join();
-        // printf("ret = %d\n",x);
-
-
-        return 0;
-    }
     //Init PQ to demo
     point_queue_t pq;
     TestInitPQ(pq);
@@ -137,9 +116,9 @@ int main(int argc, const char *argv[])
     RegressionLine rl(file_data);
 
     //get the lines
+    LineEq tsr_line = rl.tsr_line();
     LineEq max_line = rl.max_norm_line();
     LineEq lsm_line = rl.lsm_line();
-    LineEq tsr_line = rl.tsr_line();
 
 
     //(A,B,C) means AX + BY + C = 0

@@ -145,31 +145,6 @@ namespace HyOct
     {
         const RnDataList<2> & dl = data_list;
 
-        auto slop = [](const RnDataList<2> & dl, int i, int j)->double
-        {
-            double ret = 0;
-            double dem  = dl[j](0) - dl[i](0);
-
-            if (dem == 0)
-                return 1024;
-
-            ret = (dl[j](1) - dl[i](1))/dem;
-            return ret;
-        };
-
-        auto intp = [](const RnDataList<2> & dl, int i, int j)->double
-        {
-            double ret = 0;
-            double dem  = dl[j](0) - dl[i](0);
-
-            if (dem == 0)
-                return 1024;
-
-            ret = (dl[j](0)*dl[i](1) - dl[i](0)*dl[j](1))/dem;
-            return ret;
-        };
-
-
         const int N = data_list.size();
 
         using namespace std;
@@ -213,12 +188,20 @@ namespace HyOct
         TSRCtxSlop tslp;
         TSRCtxIntp titp;
 
+#if 1
+        fprintf(stderr, "to go slop\n");
         thread th_slop(repeatMed, std::ref(tslp),  std::ref(col_s), std::cref(dl));
+        fprintf(stderr, "go slop\n");
         thread th_intp(repeatMed, std::ref(titp),  std::ref(col_i), std::cref(dl));
+        fprintf(stderr, "go intp\n");
 
         th_slop.join();
         th_intp.join();
+        printf("don!\n");
+#endif
 
+        // repeatMed((tslp),  (col_s), (dl));
+        // repeatMed((titp),  (col_i), (dl));
 
         HyOct::LineEq ret_eq = HyOct::LineEq(col_s[N/2], -1,  col_i[N/2]);
         return ret_eq;
