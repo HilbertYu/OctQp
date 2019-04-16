@@ -156,23 +156,16 @@ namespace HyOct
 
     LineEq RegressionLine::tsr_line(void) const
     {
-        const RnDataList<2> & dl = data_list;
-
         using namespace std;
+        const RnDataList<2> & dl = data_list;
 
         class TSRCtxSlop: public TSRCtxBase
         {
         public:
             double operator()(const HyOct::RnDataList<2> & dl, int i, int j)
             { 
-                double ret = 0;
-                double dem  = dl[j](0) - dl[i](0);
-
-                if (dem == 0)
-                    return 1024;
-
-                ret = (dl[j](1) - dl[i](1))/dem;
-                return ret;
+                const double dem  = dl[j](0) - dl[i](0);
+                return (dem == 0)? DBL_MAX: (dl[j](1) - dl[i](1))/dem;
             }
         };
 
@@ -181,17 +174,11 @@ namespace HyOct
         public:
             double operator()(const HyOct::RnDataList<2> & dl, int i, int j)
             { 
-                double ret = 0;
-                double dem  = dl[j](0) - dl[i](0);
-
-                if (dem == 0)
-                    return 1024;
-
-                ret = (dl[j](0)*dl[i](1) - dl[i](0)*dl[j](1))/dem;
-                return ret;
+                const double dem  = dl[j](0) - dl[i](0);
+                return (dem == 0)? DBL_MAX: 
+                    (dl[j](0)*dl[i](1) - dl[i](0)*dl[j](1))/dem;
             }
         };
-
 
         TSRCtxSlop tslp;
         TSRCtxIntp titp;
@@ -199,8 +186,7 @@ namespace HyOct
         TSRCtxBase::ThArgs arg_ts(tslp, dl);
         TSRCtxBase::ThArgs arg_ti(titp, dl);
 
-        pthread_t ths;
-        pthread_t thi;
+        pthread_t ths, thi;
 
         pthread_create(&ths, NULL, TSRCtxBase::repeatMedPtr, &arg_ts);
         pthread_create(&thi, NULL, TSRCtxBase::repeatMedPtr, &arg_ti);
@@ -210,7 +196,6 @@ namespace HyOct
 
         double ret_slop = tslp.ans;
         double ret_intp = titp.ans;
-
 
         HyOct::LineEq ret_eq = HyOct::LineEq(ret_slop, -1, ret_intp);
         return ret_eq;
