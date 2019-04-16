@@ -102,5 +102,75 @@ namespace HyOct
         return LineEq(r(0), r(1), r(2));
     }
 
+    LineEq RegressionLine::tsr_line(void) const
+    {
+        const RnDataList<2> & dl = data_list;
+
+        auto slop = [&dl](int i, int j)->double
+        {
+            double ret = 0;
+            double dem  = dl[j](0) - dl[i](0);
+
+            if (dem == 0)
+                return 1024;
+
+            ret = (dl[j](1) - dl[i](1))/dem;
+            return ret;
+        };
+
+        auto intp = [&dl](int i, int j)->double
+        {
+            double ret = 0;
+            double dem  = dl[j](0) - dl[i](0);
+
+            if (dem == 0)
+                return 1024;
+
+            ret = (dl[j](0)*dl[i](1) - dl[i](0)*dl[j](1))/dem;
+            return ret;
+        };
+
+
+        const int N = data_list.size();
+
+        using namespace std;
+        vector<double> col_s(N, 0);
+        vector<double> col_i(N, 0);
+
+
+        for (int i = 0; i < N; ++i)
+        {
+            vector<double> tmp_col_s(N, 0);
+            vector<double> tmp_col_i(N, 0);
+
+            for (int j = 0; j < N; ++j)
+            {
+
+                tmp_col_s[j] = (slop(i, j));
+                tmp_col_i[j] = (intp(i, j));
+            }
+
+            nth_element(tmp_col_s.begin(), tmp_col_s.begin() + N/2,  tmp_col_s.end());
+            nth_element(tmp_col_i.begin(), tmp_col_i.begin() + N/2,  tmp_col_i.end());
+
+            col_s[i] = (tmp_col_s.at(N/2));
+            col_i[i] = (tmp_col_i.at(N/2));
+        }
+
+
+        // for (int i = 0; i < N; ++i)
+        // {
+        //     printf("T,%.3lf\n", col_i[i]);
+        //
+        // }
+
+        nth_element(col_s.begin(), col_s.begin() + N/2,  col_s.end());
+        nth_element(col_i.begin(), col_i.begin() + N/2,  col_i.end());
+
+
+        HyOct::LineEq ret_eq = HyOct::LineEq(col_s[N/2], -1,  col_i[N/2]);
+        return ret_eq;
+
+    }
 
 };
