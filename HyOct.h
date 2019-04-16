@@ -61,7 +61,7 @@ namespace HyOct
         }
 
         template <int Dim>
-        RegressionLine(const RnData<Dim> & arg_data_list):
+        RegressionLine(const RnDataList<Dim> & arg_data_list):
             data_list(arg_data_list)
         {}
 

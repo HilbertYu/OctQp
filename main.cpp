@@ -99,20 +99,20 @@ int main(int argc, const char *argv[])
     };
 
 
+    const char * file_name = "pts";
+    RnDataList<2> file_data = R2DataFileLoader(file_name);
     {
-        const char * file_name = "pts";
-        RnDataList<2> file_data = R2DataFileLoader(file_name);
         for (size_t i = 0; i < file_data.size(); ++i)
         {
             double x = file_data[i](0);
             double y = file_data[i](1);
-            printf("%.3lf, %.3lf\n", x, y);
+            printf("PT,%.3lf, %.3lf\n", x, y);
 
         }
-        return 0;
     }
 
-    RegressionLine rl(init_f, pq, pq.n_pts);
+    //RegressionLine rl(init_f, pq, pq.n_pts);
+    RegressionLine rl(file_data);
 
     //get the lines
     LineEq max_line = rl.max_norm_line();
@@ -120,8 +120,8 @@ int main(int argc, const char *argv[])
 
 
     //(A,B,C) means AX + BY + C = 0
-    cout << max_line;
-    cout << lsm_line;
+    cout << "max-line eq : " << max_line;
+    cout << "lsm-line eq : " << lsm_line;
 
     //get the errors
     const RnDataList<2> & rn_data = rl.dataList();
