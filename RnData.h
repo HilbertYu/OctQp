@@ -45,6 +45,16 @@ namespace HyOct
         std::vector<iDataType> data_list;
     public:
 
+        typename std::vector<RnData<Dim> >::iterator begin(void)
+        {
+            return data_list.begin();
+        }
+
+        typename std::vector<RnData<Dim> >::iterator end(void)
+        {
+            return data_list.end();
+        }
+
         void push_back(const iDataType  & data)
         {
             data_list.push_back(data);

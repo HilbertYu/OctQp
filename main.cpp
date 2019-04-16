@@ -103,11 +103,12 @@ int main(int argc, const char *argv[])
     const char * file_name = "pts";
     RnDataList<2> file_data = R2DataFileLoader(file_name);
     {
-        for (size_t i = 0; i < file_data.size(); ++i)
+       //for (size_t i = 0; i < file_data.size(); ++i)
+        for (auto data: file_data)
         {
-            double x = file_data[i](0);
-            double y = file_data[i](1);
-    //        printf("PT,%.3lf, %.3lf\n", x, y);
+            double x = data(0);
+            double y = data(1);
+        //    printf("PT,%.3lf, %.3lf\n", x, y);
 
         }
     }
@@ -147,7 +148,7 @@ int main(int argc, const char *argv[])
         ts.push_back("lsm-line");
         ts.push_back("tsr-line");
 
-        for (int i = 0; i < 3; ++i)
+        for (int i: {0,1, 2})
         {
             printf("=== %s ===\n", ts[i].c_str());
 

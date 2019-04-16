@@ -117,9 +117,9 @@ namespace HyOct
         {
             const int N = dl.size();
 
+            std::vector<double> tmp_col_s(N, 0);
             for (int i = 0; i < N; ++i)
             {
-                std::vector<double> tmp_col_s(N, 0);
                 for (int j = 0; j < N; ++j)
                 {
                     tmp_col_s[j] = (cal_func(dl, i, j));
@@ -215,7 +215,7 @@ namespace HyOct
         TSRCtxSlop tslp;
         TSRCtxIntp titp;
 
-#if 1
+#if 0
         ThArgs arg_ts(tslp, col_s, dl);
         ThArgs arg_ti(titp, col_i, dl);
 
@@ -241,7 +241,7 @@ namespace HyOct
         printf("don!\n");
 #endif
 
-#if 0
+#if 1
         repeatMed((tslp),  (col_s), (dl));
         repeatMed((titp),  (col_i), (dl));
 #endif
