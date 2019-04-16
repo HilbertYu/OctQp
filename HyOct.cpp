@@ -104,85 +104,66 @@ namespace HyOct
     }
 
 
- //   template <typename Func_t, typename T>
-    //void repeatMed(T & vec, Func_t func, const RnDataList<2> &dl)
-    //void repeatMed(T & vec, Func_t func)
-    
     class TSRCtxBase
     {
     public:
-        virtual double cal_func(const HyOct::RnDataList<2> & dl, int i, int j) = 0;
+        virtual double operator()(const HyOct::RnDataList<2> & dl, int i, int j) = 0;
+        double ans;
 
-        double repeatMed(std::vector<double> & vec, const HyOct::RnDataList<2> & dl)
+        static double repeatMed(TSRCtxBase & func, const HyOct::RnDataList<2> &dl)
         {
             const int N = dl.size();
 
-            std::vector<double> tmp_col_s(N, 0);
+            std::vector<double> ret_vec(N, 0);
+            std::vector<double> vec(N, 0);
             for (int i = 0; i < N; ++i)
             {
                 for (int j = 0; j < N; ++j)
                 {
-                    tmp_col_s[j] = (cal_func(dl, i, j));
+                    ret_vec[j] = (func(dl, i, j));
                 }
 
-                nth_element(tmp_col_s.begin(), tmp_col_s.begin() + N/2,  tmp_col_s.end());
-                vec[i] = (tmp_col_s.at(N/2));
+                nth_element(ret_vec.begin(), ret_vec.begin() + N/2,  ret_vec.end());
+                vec[i] = (ret_vec.at(N/2));
             }
 
             nth_element(vec.begin(), vec.begin() + N/2,  vec.end());
+            func.ans = vec[N/2];
             return vec[N/2];
-
         }
-    };
 
-    double repeatMed(TSRCtxBase & b, std::vector<double> & vec, const HyOct::RnDataList<2> &dl)
-    {
-        return b.repeatMed(vec, dl);
-    }
+        static void *repeatMedPtr(void* args)
+        {
+            TSRCtxBase::ThArgs * pargs = (TSRCtxBase::ThArgs*)args;
+            TSRCtxBase::repeatMed(pargs->b, pargs->dl);
 
-    struct ThArgs
-    {
+            return NULL;
+        }
+
+        struct ThArgs
+        {
         public:
-
-            ThArgs(TSRCtxBase &mb, std::vector<double> & mvec, const HyOct::RnDataList<2> & mdl):
-                b(mb),
-                vec(mvec),
-                dl(mdl)
+            ThArgs(TSRCtxBase &mb, const HyOct::RnDataList<2> & mdl):
+                b(mb), dl(mdl)
         {}
 
-
-        TSRCtxBase &b;
-        std::vector<double> & vec;
-        const HyOct::RnDataList<2> &dl;
+            TSRCtxBase &b;
+            const HyOct::RnDataList<2> &dl;
+        };
 
     };
-
-
-    void *repeatMedPtr(void* args)
-    {
-        ThArgs * pargs = (ThArgs*)args;
-        repeatMed(pargs->b, pargs->vec, pargs->dl);
-
-        return NULL;
-
-    }
 
 
     LineEq RegressionLine::tsr_line(void) const
     {
         const RnDataList<2> & dl = data_list;
 
-        const int N = data_list.size();
-
         using namespace std;
-        vector<double> col_s(N, 0);
-        vector<double> col_i(N, 0);
-
 
         class TSRCtxSlop: public TSRCtxBase
         {
         public:
-            double cal_func(const HyOct::RnDataList<2> & dl, int i, int j)
+            double operator()(const HyOct::RnDataList<2> & dl, int i, int j)
             { 
                 double ret = 0;
                 double dem  = dl[j](0) - dl[i](0);
@@ -198,7 +179,7 @@ namespace HyOct
         class TSRCtxIntp: public TSRCtxBase
         {
         public:
-            double cal_func(const HyOct::RnDataList<2> & dl, int i, int j)
+            double operator()(const HyOct::RnDataList<2> & dl, int i, int j)
             { 
                 double ret = 0;
                 double dem  = dl[j](0) - dl[i](0);
@@ -215,38 +196,23 @@ namespace HyOct
         TSRCtxSlop tslp;
         TSRCtxIntp titp;
 
-#if 0
-        ThArgs arg_ts(tslp, col_s, dl);
-        ThArgs arg_ti(titp, col_i, dl);
+        TSRCtxBase::ThArgs arg_ts(tslp, dl);
+        TSRCtxBase::ThArgs arg_ti(titp, dl);
 
         pthread_t ths;
         pthread_t thi;
 
-        pthread_create(&ths, NULL, repeatMedPtr, &arg_ts);
-        pthread_create(&thi, NULL, repeatMedPtr, &arg_ti);
+        pthread_create(&ths, NULL, TSRCtxBase::repeatMedPtr, &arg_ts);
+        pthread_create(&thi, NULL, TSRCtxBase::repeatMedPtr, &arg_ti);
 
         pthread_join(ths, NULL);
         pthread_join(thi, NULL);
-#endif
 
-#if 0
-        fprintf(stderr, "to go slop\n");
-        thread th_slop(repeatMed, std::ref(tslp),  std::ref(col_s), std::cref(dl));
-        fprintf(stderr, "go slop\n");
-        thread th_intp(repeatMed, std::ref(titp),  std::ref(col_i), std::cref(dl));
-        fprintf(stderr, "go intp\n");
+        double ret_slop = tslp.ans;
+        double ret_intp = titp.ans;
 
-        th_slop.join();
-        th_intp.join();
-        printf("don!\n");
-#endif
 
-#if 1
-        repeatMed((tslp),  (col_s), (dl));
-        repeatMed((titp),  (col_i), (dl));
-#endif
-
-        HyOct::LineEq ret_eq = HyOct::LineEq(col_s[N/2], -1,  col_i[N/2]);
+        HyOct::LineEq ret_eq = HyOct::LineEq(ret_slop, -1, ret_intp);
         return ret_eq;
 
     }
